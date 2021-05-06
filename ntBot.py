@@ -72,7 +72,7 @@ while True:
         day = datetime.datetime.now()
         start_time = day.replace(hour=20, minute=0, second=0, microsecond=0)
         end_time = day.replace(hour=21, minute=0, second=0, microsecond=0)
-        if start_time < cur_time < end_time:
+        if start_time < day < end_time:
             checkNotice(linkInha, day, "Inha")
             checkNotice(linkCse, day, "Cse")
         time.sleep(3600)
