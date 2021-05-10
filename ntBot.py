@@ -12,7 +12,17 @@ def post_message(token, channel, text):
 
 
 def checkNotice(link, day, Type):
-    response = requests.get(link)
+    headers = {
+        'Accept-Encoding': 'gzip, deflate, sdch',
+        'Accept-Language': 'en-US,en;q=0.8',
+        'Upgrade-Insecure-Requests': '1',
+        'User-Agent': '',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Cache-Control': 'max-age=0',
+        'Connection': 'keep-alive',
+    }
+
+    response = requests.get(link, headers = headers)
     html = response.text
 
     if day.month < 10:
@@ -29,7 +39,8 @@ def checkNotice(link, day, Type):
         elif day.day >= 10:
             today = str(day.year) + "." + str(day.month) + \
                 "." + str(day.day) + "."
-    if Type == "Cse":
+                
+    if Type != "Inha":
         today = today[:-1]
 
     bs = bs4.BeautifulSoup(html, 'html.parser')
@@ -39,11 +50,13 @@ def checkNotice(link, day, Type):
         message = "`" + today + " 전체 공지사항`"
     elif Type == "Cse":
         message = "`" + today + " 컴퓨터공학과 공지사항`"
+    elif Type == "Ee":
+        message = "`" + today + " 전자공학과 공지사항`"
     post_message(myToken, "#학교-공지", message)
-    # print(message)
+    print(message)
 
     for elem1 in tr:
-        if str(elem1.get("class")) != "['headline']":
+        if Type == "Inha" or str(elem1.get("class")) != "['headline']":
             tdDay = elem1.find_all("td", {"class": "_artclTdRdate"})
             for elem2 in tdDay:
                 if elem2.get_text() == today:
@@ -53,14 +66,16 @@ def checkNotice(link, day, Type):
                     message = title.get_text().strip()
                     message = message.replace("새글", '')
                     post_message(myToken, "#학교-공지", message)
-                    # print(message)
+                    print(message)
 
                     if Type == "Inha":
                         message = "https://www.inha.ac.kr" + title.get("href")
                     elif Type == "Cse":
                         message = "https://cse.inha.ac.kr" + title.get("href")
+                    elif Type == "Ee":
+                        message = "https://ee.inha.ac.kr" + title.get("href")
                     post_message(myToken, "#학교-공지", message)
-                    # print(message)
+                    print(message)
 
                 
 while True:
@@ -68,15 +83,21 @@ while True:
         myToken = ""
         linkInha = "https://www.inha.ac.kr/kr/950/subview.do"
         linkCse = "https://cse.inha.ac.kr/cse/888/subview.do"
+        linkEe = "https://ee.inha.ac.kr/ee/784/subview.do"
     
         day = datetime.datetime.now()
-        start_time = day.replace(hour=20, minute=0, second=0, microsecond=0)
-        end_time = day.replace(hour=21, minute=0, second=0, microsecond=0)
+        start_time = day.replace(hour=19, minute=0, second=0, microsecond=0)
+        end_time = day.replace(hour=20, minute=0, second=0, microsecond=0)
         if start_time < day < end_time:
             checkNotice(linkInha, day, "Inha")
+            time.sleep(3)
             checkNotice(linkCse, day, "Cse")
+            time.sleep(3)
+            checkNotice(linkEe, day, "Ee")
+            time.sleep(3)
+
         time.sleep(3600)
     except Exception as e:
-        # print(e)
+        print(e)
         post_message(myToken, "#공지봇-에러로그", e)
         time.sleep(3600)
