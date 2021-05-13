@@ -23,6 +23,8 @@ def checkNotice(link, day, Type):
     }
 
     response = requests.get(link, headers = headers)
+    response.max_redirects = 100
+    response.max_
     html = response.text
 
     if day.month < 10:
