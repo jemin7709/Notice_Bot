@@ -12,20 +12,12 @@ def post_message(token, channel, text):
 
 
 def checkNotice(link, day, Type):
-    headers = {
-        'Accept-Encoding': 'gzip, deflate, sdch',
-        'Accept-Language': 'en-US,en;q=0.8',
-        'Upgrade-Insecure-Requests': '1',
-        'User-Agent': '',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Cache-Control': 'max-age=0',
-        'Connection': 'keep-alive',
-    }
-
-    response = requests.get(link, headers = headers)
-    response.max_redirects = 100
-    response.max_
-    html = response.text
+    with requests.Session() as s:
+        s.max_redirects = 100
+        # HTTP GET Request: requests대신 s 객체를 사용한다.
+        response = s.get(link)
+        # HTML 소스 가져오기
+        html = response.text
 
     if day.month < 10:
         if day.day < 10:
