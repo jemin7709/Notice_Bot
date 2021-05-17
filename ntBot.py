@@ -14,9 +14,7 @@ def post_message(token, channel, text):
 def checkNotice(link, day, Type):
     with requests.Session() as s:
         s.max_redirects = 100
-        # HTTP GET Request: requests대신 s 객체를 사용한다.
         response = s.get(link)
-        # HTML 소스 가져오기
         html = response.text
 
     if day.month < 10:
