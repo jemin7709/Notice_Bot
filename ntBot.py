@@ -10,14 +10,13 @@ def post_message(token, channel, text):
                              data={"channel": channel, "text": text}
                              )
 
-
 def checkNotice(link, day, Type):
     with requests.Session() as s:
         s.max_redirects = 100
         response = s.get(link)
         html = response.text
-        response.connection.close()
-
+        s.connection.close()
+        
     if day.month < 10:
         if day.day < 10:
             today = str(day.year) + ".0" + str(day.month) + \
@@ -32,10 +31,19 @@ def checkNotice(link, day, Type):
         elif day.day >= 10:
             today = str(day.year) + "." + str(day.month) + \
                 "." + str(day.day) + "."
-                
+
+    if Type != "Inha":
+        today = today[:-1]
+
     bs = bs4.BeautifulSoup(html, 'html.parser')
     tr = bs.find_all("tr")
-    message = "`" + today + " 전체 공지사항`"
+
+    if Type == "Inha":
+        message = "`" + today + " 전체 공지사항`"
+    elif Type == "Cse":
+        message = "`" + today + " 컴퓨터공학과 공지사항`"
+    elif Type == "Ee":
+        message = "`" + today + " 전자공학과 공지사항`"
     post_message(myToken, "#학교-공지", message)
     print(message)
 
@@ -46,15 +54,22 @@ def checkNotice(link, day, Type):
                 if elem2.get_text() == today:
                     tdTitle = elem1.find("td", {"class": "_artclTdTitle"})
                     title = tdTitle.find("a")
+
                     message = title.get_text().strip()
                     message = message.replace("새글", '')
                     post_message(myToken, "#학교-공지", message)
                     print(message)
-                    message = "https://www.inha.ac.kr" + title.get("href")
+
+                    if Type == "Inha":
+                        message = "https://www.inha.ac.kr" + title.get("href")
+                    elif Type == "Cse":
+                        message = "https://cse.inha.ac.kr" + title.get("href")
+                    elif Type == "Ee":
+                        message = "https://ee.inha.ac.kr" + title.get("href")
                     post_message(myToken, "#학교-공지", message)
                     print(message)
 
-
+             
 isNotice = True                
 while True:
     try:
