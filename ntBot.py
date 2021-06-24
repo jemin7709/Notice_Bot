@@ -15,7 +15,7 @@ def checkNotice(link, day, Type):
         s.max_redirects = 100
         response = s.get(link)
         html = response.text
-        s.connection.close()
+        response.connection.close()
         
     if day.month < 10:
         if day.day < 10:
